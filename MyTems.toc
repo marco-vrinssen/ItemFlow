@@ -1,9 +1,12 @@
 ## Interface: 120000
 ## Title: MyTems
-## Notes: Auto sell/repair at vendors, quick auction posting, and instant looting
+## Notes: Auto sell/repair at vendors, quick auction posting, instant looting, and auction favorites sync
 ## Author: MIYANKO
-## Version: 1.3.0
+## Version: 1.4.0
+## SavedVariables: MyTemsFavoritesDB
+## SavedVariablesPerCharacter: MyTemsFavoritesCharDB
 
 Merchant.lua
 Auction.lua
 Looting.lua
+FavoritesSync.lua
