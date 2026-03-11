@@ -13,6 +13,7 @@ lootState.hiddenAnchor:Hide()
 
 -- Reparent loot frame to hidden anchor to suppress it without touching its events
 local function SuppressLootFrame()
+    lootState.frameHidden = true
     if LootFrame:IsEventRegistered("LOOT_OPENED") then
         LootFrame:SetParent(lootState.hiddenAnchor)
     end
@@ -71,6 +72,9 @@ end
 local function OnLootWindowReady()
     lootState.sessionActive = true
 
+    -- Suppress immediately before Blizzard can show the frame
+    SuppressLootFrame()
+
     local totalSlots = GetNumLootItems()
     if totalSlots == 0 or lootState.lastSlotCount == totalSlots then return end
 
@@ -107,6 +111,13 @@ end
 local function OnPlayerLogin()
     SetCVar("autoLootRate", 0)
     SuppressLootFrame()
+
+    -- Block LootFrame from re-showing itself during an active auto-loot session
+    hooksecurefunc(LootFrame, "UpdateShownState", function()
+        if lootState.sessionActive and lootState.frameHidden then
+            SuppressLootFrame()
+        end
+    end)
 end
 
 -- Register all required events
@@ -127,3 +138,4 @@ lootEventFrame:SetScript("OnEvent", function(_, event, ...)
         OnGameErrorMessage(...)
     end
 end)
+    
