@@ -1,9 +1,11 @@
 ## Interface: 120000
 ## Title: ItemFlow
-## Notes: Auto repair and sell junk at vendors, spacebar auction posting, current expansion filter for auction house and crafting orders, instant background looting
+## Notes: Auto sell and repair, spacebar auction posting, paste-to-search, current expansion filter, instant looting
 ## Author: MIYANKO
 ## Version: 1.0.0
 
-SellRepair.lua
-AuctionCrafting.lua
-Looting.lua
+AutoExpacFilter.lua
+AutoSellRepair.lua
+InstantLoot.lua
+QuickPost.lua
+SearchFix.lua
