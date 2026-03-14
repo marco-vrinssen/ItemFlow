@@ -1,11 +1,14 @@
 ## Interface: 120000
 ## Title: ItemFlow
-## Notes: Auto sell and repair, spacebar auction posting, paste-to-search, current expansion filter, instant looting
+## Notes: Auto sell and repair, spacebar auction posting, paste-to-search, current expansion filter, instant looting, cross-character favorites sync
 ## Author: MIYANKO
 ## Version: 1.0.0
 
+## SavedVariables: ItemFlowAccountDB
+
 AutoExpacFilter.lua
 AutoSellRepair.lua
+FavoritesSync.lua
 InstantLoot.lua
 QuickPost.lua
 SearchFix.lua

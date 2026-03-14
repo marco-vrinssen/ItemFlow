@@ -1,7 +1,10 @@
-local auctionFrame = CreateFrame("Frame")
-local searchHooked = false
+-- Auto trigger auction house search on paste to skip manual button clicks because pasting an item name should immediately start searching
 
--- Retry clicking the search button until enabled, up to 10 attempts
+local searchFrame = CreateFrame("Frame")
+local isSearchHooked = false
+
+-- Retry clicking the search button until enabled to handle throttling because the search button may be temporarily disabled after recent queries
+
 local function TryClickSearch(attempts)
     if not AuctionHouseFrame or not AuctionHouseFrame:IsShown() then return end
     local searchButton = AuctionHouseFrame.SearchBar.SearchButton
@@ -13,11 +16,12 @@ local function TryClickSearch(attempts)
     end
 end
 
--- Hook the search box once to detect paste events via length jump
+-- Hook the search box text change to detect paste events via length jumps because pasted text causes a sudden increase in character count
+
 local function HookSearchBox()
-    if searchHooked then return end
+    if isSearchHooked then return end
     if not AuctionHouseFrame or not AuctionHouseFrame.SearchBar then return end
-    local searchBox  = AuctionHouseFrame.SearchBar.SearchBox
+    local searchBox = AuctionHouseFrame.SearchBar.SearchBox
     local lastLength = 0
     searchBox:HookScript("OnTextChanged", function(self)
         local text = self:GetText()
@@ -26,11 +30,13 @@ local function HookSearchBox()
         end
         lastLength = #text
     end)
-    searchHooked = true
+    isSearchHooked = true
 end
 
--- Apply the hook once when the auction house first opens
-auctionFrame:RegisterEvent("AUCTION_HOUSE_SHOW")
-auctionFrame:SetScript("OnEvent", function(_, event)
+-- Apply the search hook when auction house first opens to initialize paste detection because the search box must exist before it can be hooked
+
+searchFrame:RegisterEvent("AUCTION_HOUSE_SHOW")
+
+searchFrame:SetScript("OnEvent", function(_, event)
     if event == "AUCTION_HOUSE_SHOW" then HookSearchBox() end
 end)
