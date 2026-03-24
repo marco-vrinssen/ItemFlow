@@ -1,59 +1,60 @@
-local offscreenAnchor = CreateFrame("Frame", nil, UIParent)
-offscreenAnchor:Hide()
+-- State
 
-local lootFrameSuppressed = false
+local lastLootTime = 0
+local suppressLootFrameShow = false
+local LOOT_COOLDOWN = 0.2
 
+-- Suppress LootFrame:Show() to prevent flash before our handler runs
 
-local function SuppressLootFrame()
-    LootFrame:SetParent(offscreenAnchor)
+local originalLootFrameShow = LootFrame.Show
+
+LootFrame.Show = function(self, ...)
+    if not suppressLootFrameShow then
+        originalLootFrameShow(self, ...)
+    end
 end
 
-local function ReleaseLootFrame()
-    lootFrameSuppressed = false
-    LootFrame:SetParent(UIParent)
-    LootFrame:SetFrameStrata("HIGH")
+-- Loot all unlocked items in reverse order to avoid index shifting
+
+local function LootUnlockedItems()
+    for slotIndex = GetNumLootItems(), 1, -1 do
+        local _, _, _, _, _, isLocked = GetLootSlotInfo(slotIndex)
+        if not isLocked then
+            LootSlot(slotIndex)
+        end
+    end
 end
 
+-- Hide frame during looting, restore if locked items remain
+
+local function SuppressAndLoot()
+    suppressLootFrameShow = true
+    LootFrame:Hide()
+
+    LootUnlockedItems()
+
+    suppressLootFrameShow = false
+
+    if GetNumLootItems() == 0 then
+        CloseLoot()
+    else
+        LootFrame:Show()
+    end
+end
+
+-- Skip if auto-loot is inactive or cooldown has not elapsed
+
+local function OnLootReady()
+    if GetCVarBool("autoLootDefault") == IsModifiedClick("AUTOLOOTTOGGLE") then return end
+    if (GetTime() - lastLootTime) < LOOT_COOLDOWN then return end
+
+    SuppressAndLoot()
+
+    lastLootTime = GetTime()
+end
+
+-- Register
 
 local eventFrame = CreateFrame("Frame")
-eventFrame:RegisterEvent("PLAYER_LOGIN")
 eventFrame:RegisterEvent("LOOT_READY")
-eventFrame:RegisterEvent("LOOT_OPENED")
-eventFrame:RegisterEvent("LOOT_CLOSED")
-eventFrame:RegisterEvent("UI_ERROR_MESSAGE")
-
-eventFrame:SetScript("OnEvent", function(_, event, ...)
-
-    if event == "PLAYER_LOGIN" then
-        SetCVar("autoLootRate", 0)
-        SuppressLootFrame()
-        hooksecurefunc(LootFrame, "UpdateShownState", function()
-            if lootFrameSuppressed then SuppressLootFrame() end
-        end)
-
-    elseif event == "LOOT_READY" then
-        if GetCVarBool("autoLootDefault") ~= IsModifiedClick("AUTOLOOTTOGGLE") then
-            lootFrameSuppressed = true
-            local hasLockedSlots = false
-            for i = GetNumLootItems(), 1, -1 do
-                local _, _, _, isLocked = GetLootSlotInfo(i)
-                if isLocked then hasLockedSlots = true else LootSlot(i) end
-            end
-            if hasLockedSlots then ReleaseLootFrame() end
-        end
-
-    elseif event == "LOOT_OPENED" then
-        if lootFrameSuppressed then SuppressLootFrame() end
-
-    elseif event == "LOOT_CLOSED" then
-        lootFrameSuppressed = false
-        SuppressLootFrame()
-
-    elseif event == "UI_ERROR_MESSAGE" then
-        local _, msg = ...
-        if lootFrameSuppressed and tContains({ ERR_INV_FULL, ERR_ITEM_MAX_COUNT, ERR_LOOT_ROLL_PENDING }, msg) then
-            ReleaseLootFrame()
-        end
-
-    end
-end)
+eventFrame:SetScript("OnEvent", OnLootReady)
