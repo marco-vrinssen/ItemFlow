@@ -3,6 +3,7 @@
 ## Notes: Auto sell/repair, spacebar auction posting, paste and shift-click to search, current expansion filter, instant looting, cross-character favorites sync
 ## Author: MIYANKO
 ## Version: 1.0.0
+## IconTexture: 7549124
 
 ## SavedVariables: ItemFlowAccountDB
 
