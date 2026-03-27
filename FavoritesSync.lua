@@ -88,12 +88,12 @@ end
 -- Trigger a favorites search to save current favorites because the API requires a search before results are available
 function auctionHouse.Save()
     if not C_AuctionHouse.FavoritesAreAvailable() then
-        print("|cffff9900ItemFlow:|r AH favorites are not available right now.")
+        print("|cffff9900SuperAuction:|r AH favorites are not available right now.")
         return
     end
 
     if not C_AuctionHouse.HasFavorites() then
-        print("|cffff9900ItemFlow:|r You have no AH favorites to save.")
+        print("|cffff9900SuperAuction:|r You have no AH favorites to save.")
         return
     end
 
@@ -104,7 +104,7 @@ end
 -- Import saved favorites from database to restore them on current character
 function auctionHouse.Import()
     if not C_AuctionHouse.FavoritesAreAvailable() then
-        print("|cffff9900ItemFlow:|r AH favorites are not available right now.")
+        print("|cffff9900SuperAuction:|r AH favorites are not available right now.")
         return
     end
 
@@ -115,7 +115,7 @@ function auctionHouse.Import()
     end
 
     if C_AuctionHouse.HasMaxFavorites() then
-        print("|cffff9900ItemFlow:|r Your AH favorites list is full. Clear some before importing.")
+        print("|cffff9900SuperAuction:|r Your AH favorites list is full. Clear some before importing.")
         return
     end
 

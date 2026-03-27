@@ -1,0 +1,13 @@
+## Interface: 120000
+## Title: Super Auction
+## Notes: Expansion filter, spacebar posting, paste and shift-click search, cross-character favorites sync
+## Author: MIYANKO
+## Version: 1.0.0
+## IconTexture: 7549124
+
+## SavedVariables: ItemFlowAccountDB
+
+AutoExpacFilter.lua
+FavoritesSync.lua
+PasteSearchFix.lua
+QuickPost.lua
